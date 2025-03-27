@@ -1,6 +1,5 @@
+// code here
 
-
-// You code here
 // Fetch characters and render them in the character bar
 document.addEventListener("DOMContentLoaded", () => {
     const characterBar = document.getElementById("character-bar");
