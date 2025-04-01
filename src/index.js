@@ -1,5 +1,4 @@
-//code here
-      
+//          DOM
 const charBar = document.getElementById("character-bar");
 const Info = document.getElementById("detailed-info");
 const Jina = document.getElementById("name");
