@@ -1,74 +1,112 @@
-// code here
+//code here
+      
+const charBar = document.getElementById("character-bar");
+const Info = document.getElementById("detailed-info");
+const Jina = document.getElementById("name");
+const Picha = document.getElementById("image");
+const vc = document.getElementById("vote-count");
+const vf = document.getElementById("votes-form");
+const rb = document.getElementById("reset-btn");
+const votes = document.getElementById("votes")
+const cf = document.getElementById("character-form")
 
-// Fetch characters and render them in the character bar
-document.addEventListener("DOMContentLoaded", () => {
-    const characterBar = document.getElementById("character-bar");
-    const detailedInfo = document.getElementById("detailed-info");
-    const voteForm = document.getElementById("votes-form");
-    const resetButton = document.getElementById("reset-btn");
 
-fetch("http://localhost:3000/characters")
-    .then(response => response.json())
-    .then(data => {
-        const characters = data;
-        const characterBar = document.getElementById("character-bar");
 
-        characters.forEach(character => {
-            const span = document.createElement("span");
-            span.textContent = character.name;
-            span.style.cursor = "pointer";
-            span.addEventListener("click", () => displayCharacterDetails(character));
-            characterBar.appendChild(span);
-        });
+//          variables
+let currentID = 0;
+let currentVotes = 0;
+
+
+//          Display all Flatacuties
+function displayFlatacuties(){
+    fetch("http://localhost:3000/characters")
+    .then((newValue)=>newValue.json())
+    .then((flataCuties)=>{
+
+        /*
+            {
+                "id": 1,
+                "name": "Mr. Cute",
+                "image": "https://thumbs.gfycat.com/EquatorialIckyCat-max-1mb.gif",
+                "votes": 0
+            }
+        */
+
+
+        for (x of flataCuties) {
+            const name = document.createElement("span")
+            name.innerText = x.name
+        
+            charBar.appendChild(name);
+            let faltaName = x.name
+            let pich = x.image
+            let id = x.id
+            let Vs = x.votes
+            
+            name.addEventListener("click", ()=>{
+                
+                
+                Jina.innerText = faltaName;
+                Picha.src = pich ;
+                let votesamounts = votes.value;
+                 
+                vc.innerText = Vs;
+                console.log(Vs);
+                currentID = id;
+                currentVotes = Vs;
+
+            })
+        }
     })
-    .catch(error => console.error("fetching error character:", error));
-// Display "Mr. Cute" by default
-const mrCute = characters.find((character) => character.name === "Mr. Cute");
-if (mrCute) {
-    displayCharacterDetails(mrCute);
 }
-});
-function displayCharacterDetails(character) {
-    const nameElement = document.getElementById("name");
-    const imageElement = document.getElementById("image");
-    const voteCountElement = document.getElementById("vote-count");
 
-nameElement.textContent = character.name;
-imageElement.src = character.image;
-imageElement.alt = character.name;
-voteCountElement.textContent = character.votes;
-
-// Handle vote submission
-votesForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const voteInput = document.getElementById('votes');
-    const votes =  parseInt(voteInput.value) || 0;
-    selectedCharacter.votes += votes;
-    voteCountElement.textContent = selectedCharacter.votes ;
-    voteInput.value = '';
-})
-    // Update the votes in the database
-    fetch(`http://localhost:3000/characters/${character.id}`, {
+vf.addEventListener("submit", function(event) {
+    event.preventDefault(); 
+    let update = {
+        votes: parseInt(votes.value, 10) + parseInt(currentVotes, 10)
+    }
+    console.log("Votes entered:", votes);
+    fetch(`http://localhost:3000/characters/${currentID}`, {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ votes: character.votes }),
-    });
-}
-votesInput.value = "";
-
-// Handle vote reset
-resetButton.onclick = () => {
-    character.votes = 0;
-    voteCountElement.textContent = character.votes;
-
-// Reset the votes in the database
-fetch(`http://localhost:3000/characters/${character.id}`, {
-    method: "PATCH",
-    headers: {
-        "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ votes: character.votes }),
+        headers: {"Content-Type": "application/json",},
+        body: JSON.stringify(update)
+    })
 });
-};
+
+rb.addEventListener("click", function(event) {
+    let update = {
+        votes: 0,
+    }
+    console.log("Votes entered:", votes);
+    fetch(`http://localhost:3000/characters/${currentID}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json",},
+        body: JSON.stringify(update)
+    })
+});
+
+
+cf.addEventListener("submit", function(event) {
+    event.preventDefault(); 
+
+    let Jin = document.getElementById("nameInsert").value;
+    let imageUrl = document.getElementById("image-url").value;
+
+    
+    console.log("Character Name:", Jin);
+    console.log("Image URL:", imageUrl);
+    const newChar = {
+        name: Jin,
+        image: imageUrl,
+        votes: 0,
+    }
+
+    fetch(`http://localhost:3000/characters`,{
+        method: "POST",
+        headers:{"Content-Type": "application/json",},
+        body: JSON.stringify(newChar)
+    })
+   
+});
+
+displayFlatacuties()
